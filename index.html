@@ -1,0 +1,1027 @@
+ESCANER QR SOCIAL
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner QR Funcional</title>
+    <style>
+        .qr-scanner-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-container {
+            margin: 0 auto 20px;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .company-logo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .login-box h2 {
+            margin: 10px 0 25px;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #4a148c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74,20,140,0.2);
+        }
+
+        .password-group {
+            margin-bottom: 25px;
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            user-select: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #4a148c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 48px;
+        }
+
+        .login-btn:hover {
+            background: #3d106f;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            min-height: 18px;
+        }
+
+        .scanner-screen {
+            background-color: #f5f7fa;
+            border-radius: 10px;
+            overflow: hidden;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+
+        .scanner-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #4a148c;
+            font-weight: 700;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            color: #4a148c;
+            border: 2px solid #4a148c;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #4a148c;
+            color: white;
+        }
+
+        .scanner-wrapper {
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .scanner {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 3px solid #4a148c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .scanner video {
+            width: 100%;
+            display: block;
+        }
+
+        .scanner canvas {
+            display: none;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: 40px solid rgba(0, 0, 0, 0.3);
+            box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.5);
+            z-index: 1;
+        }
+
+        .scanner-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .scan-btn {
+            padding: 12px 25px;
+            background: #4a148c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .scan-btn:hover {
+            background: #3d106f;
+        }
+
+        .scan-btn.stop {
+            background: #e74c3c;
+        }
+
+        .scan-btn.stop:hover {
+            background: #c0392b;
+        }
+
+        .scan-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .scan-results {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .scan-results h3 {
+            margin-top: 0;
+            color: #4a148c;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .results-count {
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .scan-history {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            background: #fafafa;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .export-btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .clear-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .scan-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .scan-item.double-scan {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .scan-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .scan-data {
+            font-family: monospace;
+            font-size: 0.95rem;
+            flex: 1;
+            word-break: break-all;
+            padding-right: 10px;
+        }
+
+        .scan-time {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .double-scan .scan-time {
+            color: #e57373;
+        }
+
+        .double-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .no-scans {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .login-box {
+                padding: 25px 20px;
+            }
+            
+            .logo-container {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .scanner-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .scanner-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .scan-btn, .export-btn, .clear-btn {
+                width: 100%;
+            }
+            
+            .results-count {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            max-width: 300px;
+            opacity: 0;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background: #2e7d32;
+        }
+
+        .notification.double {
+            background: #e74c3c;
+        }
+
+        .notification small {
+            display: block;
+            margin-top: 5px;
+            font-weight: normal;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-scanner-container">
+        <!-- Pantalla de Login -->
+        <div id="login-screen" class="login-screen">
+            <div class="login-box">
+                <div class="logo-container">
+                    <img id="company-logo" src="http://qr-social.com/wp-content/uploads/2025/04/1234.png" alt="Logo de la empresa" class="company-logo">
+                </div>
+                <h2>Acceso al Escáner QR</h2>
+                <div class="input-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario">
+                </div>
+                <div class="input-group password-group">
+                    <label for="password">Clave:</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" placeholder="Ingrese su clave">
+                        <span id="toggle-password" class="toggle-password">👁️</span>
+                    </div>
+                </div>
+                <button id="login-btn" class="login-btn">
+                    <span id="login-text">Ingresar</span>
+                    <div id="login-spinner" class="spinner" style="display: none;"></div>
+                </button>
+                <p id="login-error" class="error-message"></p>
+            </div>
+        </div>
+
+        <!-- Pantalla del Escáner -->
+        <div id="scanner-screen" class="scanner-screen" style="display:none;">
+            <div class="scanner-header">
+                <h2>Escáner QR SOCIAL</h2>
+                <div class="user-info">
+                    <span id="user-display">Usuario: </span>
+                    <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+                </div>
+            </div>
+            
+            <div class="scanner-wrapper">
+                <div id="scanner" class="scanner">
+                    <video id="video" playsinline></video>
+                    <canvas id="canvas"></canvas>
+                    <div class="scan-overlay"></div>
+                </div>
+                
+                <div class="scanner-controls">
+                    <button id="start-scan" class="scan-btn">Iniciar Escáner</button>
+                    <button id="stop-scan" class="scan-btn stop" disabled>Detener Escáner</button>
+                </div>
+            </div>
+            
+            <div class="scan-results">
+                <h3>Resultados del Escaneo</h3>
+                <div class="results-count">
+                    <span>Total escaneos únicos: <span id="total-scans">0</span></span>
+                    <span>Dobles escaneos: <span id="duplicate-scans">0</span></span>
+                    <span>Covers: <span id="cover-scans">0</span></span>
+                    <span>Entradas: <span id="entrada-scans">0</span></span>
+                </div>
+                <div id="scan-history" class="scan-history"></div>
+                
+                <div class="action-buttons">
+                    <button id="export-pdf" class="export-btn">Exportar a PDF</button>
+                    <button id="clear-data" class="clear-btn">Borrar Datos</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Elemento de audio para el sonido de escaneo -->
+        <audio id="scan-sound" src="http://qr-social.com/wp-content/uploads/2025/06/store-scanner-beep-90395.mp3" preload="auto"></audio>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        // Variables globales
+        let scanning = false;
+        let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
+        let uniqueScans = new Set(JSON.parse(localStorage.getItem('uniqueScans')) || []);
+        let duplicateCount = parseInt(localStorage.getItem('duplicateCount')) || 0;
+        let coverCount = parseInt(localStorage.getItem('coverCount')) || 0;
+        let entradaCount = parseInt(localStorage.getItem('entradaCount')) || 0;
+        let videoStream = null;
+        let lastScanTime = 0;
+        let scanTimeout = null;
+        const SCAN_INTERVAL = 100; // Intervalo entre escaneos en ms
+        const SCAN_COOLDOWN = 1000; // Tiempo mínimo entre detecciones
+        const SCAN_WIDTH = 320; // Ancho ideal para el escaneo
+        const SCAN_HEIGHT = 240; // Alto ideal para el escaneo
+        const { jsPDF } = window.jspdf;
+
+        // Elementos del DOM
+        const loginScreen = document.getElementById('login-screen');
+        const scannerScreen = document.getElementById('scanner-screen');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const loginText = document.getElementById('login-text');
+        const loginSpinner = document.getElementById('login-spinner');
+        const loginError = document.getElementById('login-error');
+        const togglePassword = document.getElementById('toggle-password');
+        const logoutBtn = document.getElementById('logout-btn');
+        const startScanBtn = document.getElementById('start-scan');
+        const stopScanBtn = document.getElementById('stop-scan');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const canvasContext = canvas.getContext('2d', { willReadFrequently: true });
+        const totalScansElement = document.getElementById('total-scans');
+        const duplicateScansElement = document.getElementById('duplicate-scans');
+        const coverScansElement = document.getElementById('cover-scans');
+        const entradaScansElement = document.getElementById('entrada-scans');
+        const scanHistoryElement = document.getElementById('scan-history');
+        const exportPdfBtn = document.getElementById('export-pdf');
+        const clearDataBtn = document.getElementById('clear-data');
+        const scanSound = document.getElementById('scan-sound');
+        const userDisplay = document.getElementById('user-display');
+
+        // Mostrar/ocultar contraseña
+        togglePassword.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePassword.textContent = '👁️';
+            } else {
+                passwordInput.type = 'password';
+                togglePassword.textContent = '👁️';
+            }
+        });
+
+        // Login
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showLoginError('Por favor ingrese usuario y clave');
+                return;
+            }
+            
+            loginText.style.display = 'none';
+            loginSpinner.style.display = 'block';
+            loginBtn.disabled = true;
+            
+            setTimeout(() => {
+                // Simular respuesta del servidor
+                if (username === 'admin' && password === 'admin123') {
+                    // Guardar estado de login
+                    localStorage.setItem('loggedIn', 'true');
+                    localStorage.setItem('username', username);
+                    
+                    loginScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loginScreen.style.display = 'none';
+                        scannerScreen.style.display = 'flex';
+                        setTimeout(() => {
+                            scannerScreen.style.opacity = '1';
+                            userDisplay.textContent = `Usuario: ${username}`;
+                        }, 10);
+                    }, 300);
+                } else {
+                    showLoginError('Usuario o clave incorrectos');
+                }
+                
+                loginText.style.display = 'block';
+                loginSpinner.style.display = 'none';
+                loginBtn.disabled = false;
+            }, 1000);
+        });
+
+        function showLoginError(message) {
+            loginError.textContent = message;
+            setTimeout(() => {
+                loginError.textContent = '';
+            }, 3000);
+        }
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            // Limpiar datos de sesión
+            localStorage.removeItem('loggedIn');
+            localStorage.removeItem('username');
+            
+            scannerScreen.style.opacity = '0';
+            setTimeout(() => {
+                scannerScreen.style.display = 'none';
+                loginScreen.style.display = 'flex';
+                setTimeout(() => {
+                    loginScreen.style.opacity = '1';
+                }, 10);
+                
+                usernameInput.value = '';
+                passwordInput.value = '';
+                
+                if (scanning) {
+                    stopScanner();
+                }
+            }, 300);
+        });
+
+        // Función para guardar datos en localStorage
+        function saveData() {
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+            localStorage.setItem('uniqueScans', JSON.stringify(Array.from(uniqueScans)));
+            localStorage.setItem('duplicateCount', duplicateCount.toString());
+            localStorage.setItem('coverCount', coverCount.toString());
+            localStorage.setItem('entradaCount', entradaCount.toString());
+        }
+
+        // Escáner QR optimizado
+        async function startScanner() {
+            scanning = true;
+            startScanBtn.disabled = true;
+            stopScanBtn.disabled = false;
+            
+            try {
+                // Detener cualquier stream existente
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Configuración mejorada para la cámara
+                const constraints = {
+                    video: {
+                        facingMode: "environment",
+                        width: { ideal: SCAN_WIDTH },
+                        height: { ideal: SCAN_HEIGHT },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: false
+                };
+                
+                // Solicitar acceso a la cámara
+                videoStream = await navigator.mediaDevices.getUserMedia(constraints)
+                    .catch(err => {
+                        console.error("Error al acceder a la cámara:", err);
+                        showNotification('Error al acceder a la cámara: ' + err.message, false);
+                        stopScanner();
+                        throw err;
+                    });
+                
+                // Configurar el elemento de video
+                video.srcObject = videoStream;
+                video.setAttribute("playsinline", true);
+                
+                // Esperar a que el video esté listo
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        video.play()
+                            .then(resolve)
+                            .catch(err => {
+                                console.error("Error al reproducir video:", err);
+                                showNotification('Error al iniciar la cámara', false);
+                                stopScanner();
+                                throw err;
+                            });
+                    };
+                });
+                
+                // Configurar canvas
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Iniciar el loop de escaneo
+                scanLoop();
+                
+            } catch (error) {
+                console.error("Error en startScanner:", error);
+                stopScanner();
+            }
+        }
+
+        function scanLoop() {
+            if (!scanning) return;
+            
+            const currentTime = Date.now();
+            if (currentTime - lastScanTime < SCAN_COOLDOWN) {
+                scanTimeout = setTimeout(scanLoop, SCAN_INTERVAL);
+                return;
+            }
+            
+            try {
+                // Dibujar el frame actual en el canvas
+                canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Obtener datos de imagen
+                const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Escanear código QR
+                const code = jsQR(imageData.data, canvas.width, canvas.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                
+                if (code) {
+                    lastScanTime = currentTime;
+                    processScannedCode(code.data);
+                }
+            } catch (e) {
+                console.error("Error en el escaneo:", e);
+            }
+            
+            scanTimeout = setTimeout(scanLoop, SCAN_INTERVAL);
+        }
+
+        function stopScanner() {
+            scanning = false;
+            clearTimeout(scanTimeout);
+            startScanBtn.disabled = false;
+            stopScanBtn.disabled = true;
+            
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+
+        function processScannedCode(codeData) {
+            const now = new Date();
+            const scanTime = now.toLocaleTimeString();
+            const scanDate = now.toLocaleDateString();
+            
+            // Verificar tipo de escaneo
+            const isCover = codeData.toLowerCase().includes('cover');
+            const isEntrada = codeData.toLowerCase().includes('entrada');
+            const scanType = isCover ? 'Cover' : (isEntrada ? 'Entrada' : 'Desconocido');
+            
+            // Verificar si es duplicado
+            const isDuplicate = uniqueScans.has(codeData);
+            
+            if (!isDuplicate) {
+                uniqueScans.add(codeData);
+                
+                if (isCover) coverCount++;
+                if (isEntrada) entradaCount++;
+                
+                // Agregar al historial
+                scanHistory.unshift({
+                    data: codeData,
+                    time: scanTime,
+                    date: scanDate,
+                    duplicate: false,
+                    type: scanType
+                });
+                
+                showNotification(`Escaneo exitoso (${scanType})`, true, codeData);
+            } else {
+                duplicateCount++;
+                
+                // Agregar al historial como duplicado
+                scanHistory.unshift({
+                    data: codeData,
+                    time: scanTime,
+                    date: scanDate,
+                    duplicate: true,
+                    type: scanType
+                });
+                
+                showNotification(`Doble escaneo (${scanType})`, false, codeData);
+            }
+            
+            // Reproducir sonido
+            scanSound.currentTime = 0;
+            scanSound.play();
+            
+            // Guardar datos y actualizar UI
+            saveData();
+            updateUI();
+        }
+
+        function updateUI() {
+            totalScansElement.textContent = uniqueScans.size;
+            duplicateScansElement.textContent = duplicateCount;
+            coverScansElement.textContent = coverCount;
+            entradaScansElement.textContent = entradaCount;
+            
+            // Actualizar historial
+            scanHistoryElement.innerHTML = '';
+            
+            if (scanHistory.length === 0) {
+                scanHistoryElement.innerHTML = '<div class="no-scans">No hay escaneos registrados</div>';
+                return;
+            }
+            
+            scanHistory.forEach(scan => {
+                const scanItem = document.createElement('div');
+                scanItem.className = `scan-item ${scan.duplicate ? 'double-scan' : ''}`;
+                
+                const typeBadge = scan.type !== 'Desconocido' ? 
+                    `<span class="type-badge" style="background: ${scan.type === 'Cover' ? '#4a148c' : '#2e7d32'}; 
+                     color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">
+                     ${scan.type}
+                    </span>` : '';
+                
+                scanItem.innerHTML = `
+                    <div class="scan-data">
+                        ${scan.data} ${typeBadge}
+                        ${scan.duplicate ? '<span class="double-badge">Doble</span>' : ''}
+                    </div>
+                    <div class="scan-time">${scan.time} - ${scan.date}</div>
+                `;
+                
+                scanHistoryElement.appendChild(scanItem);
+            });
+        }
+
+        function showNotification(message, isSuccess, details = '') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${isSuccess ? 'success' : 'double'}`;
+            notification.innerHTML = `${message}${details ? '<small>' + details + '</small>' : ''}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Exportar a PDF
+        exportPdfBtn.addEventListener('click', () => {
+            if (scanHistory.length === 0) {
+                showNotification('No hay datos para exportar', false);
+                return;
+            }
+            
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(18);
+            doc.text('Reporte de Escaneos QR', 105, 15, { align: 'center' });
+            
+            // Información de resumen
+            doc.setFontSize(12);
+            doc.text(`Total escaneos únicos: ${uniqueScans.size}`, 14, 25);
+            doc.text(`Dobles escaneos: ${duplicateCount}`, 14, 30);
+            doc.text(`Covers escaneados: ${coverCount}`, 14, 35);
+            doc.text(`Entradas escaneadas: ${entradaCount}`, 14, 40);
+            
+            // Tabla de escaneos
+            const headers = [['Tipo', 'Código', 'Hora', 'Fecha', 'Estado']];
+            const data = scanHistory.map(scan => [
+                scan.type,
+                scan.data,
+                scan.time,
+                scan.date,
+                scan.duplicate ? 'Doble' : 'Único'
+            ]);
+            
+            doc.autoTable({
+                head: headers,
+                body: data,
+                startY: 45,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [74, 20, 140],
+                    textColor: 255
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 245, 245]
+                },
+                columnStyles: {
+                    0: { cellWidth: 20 },
+                    1: { cellWidth: 'auto' },
+                    2: { cellWidth: 20 },
+                    3: { cellWidth: 20 },
+                    4: { cellWidth: 15 }
+                }
+            });
+            
+            // Guardar el PDF
+            doc.save(`reporte_escaneos_${new Date().toISOString().slice(0, 10)}.pdf`);
+            showNotification('Reporte exportado a PDF', true);
+        });
+
+        // Limpiar datos
+        clearDataBtn.addEventListener('click', () => {
+            if (scanHistory.length === 0) return;
+            
+            if (confirm('¿Está seguro que desea borrar todos los datos de escaneo?')) {
+                scanHistory = [];
+                uniqueScans.clear();
+                duplicateCount = 0;
+                coverCount = 0;
+                entradaCount = 0;
+                
+                // Limpiar localStorage
+                localStorage.removeItem('scanHistory');
+                localStorage.removeItem('uniqueScans');
+                localStorage.removeItem('duplicateCount');
+                localStorage.removeItem('coverCount');
+                localStorage.removeItem('entradaCount');
+                
+                updateUI();
+                showNotification('Datos borrados exitosamente', true);
+            }
+        });
+
+        // Inicializar UI
+        updateUI();
+
+        // Event listeners para los botones de escaneo
+        startScanBtn.addEventListener('click', startScanner);
+        stopScanBtn.addEventListener('click', stopScanner);
+
+        // Al cargar la página, verificar si hay sesión activa
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedIn = localStorage.getItem('loggedIn') === 'true';
+            const username = localStorage.getItem('username');
+            
+            if (loggedIn && username) {
+                loginScreen.style.display = 'none';
+                scannerScreen.style.display = 'flex';
+                scannerScreen.style.opacity = '1';
+                userDisplay.textContent = `Usuario: ${username}`;
+                updateUI();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
