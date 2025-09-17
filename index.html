@@ -1,4 +1,3 @@
-ESCANER QR SOCIAL
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -643,8 +642,9 @@ ESCANER QR SOCIAL
             loginBtn.disabled = true;
             
             setTimeout(() => {
-                // Simular respuesta del servidor
-                if (username === 'admin' && password === 'admin123') {
+                // Verificar credenciales - AQUÍ SE AGREGÓ EL NUEVO USUARIO
+                if ((username === 'admin' && password === 'admin123') || 
+                    (username === 'sonica' && password === 'sonica23')) {
                     // Guardar estado de login
                     localStorage.setItem('loggedIn', 'true');
                     localStorage.setItem('username', username);
@@ -731,7 +731,7 @@ ESCANER QR SOCIAL
                 };
                 
                 // Solicitar acceso a la cámara
-                videoStream = await navigator.mediaDevices.getUserMedia(constraints)
+                videoStream = await navig.mediaDevices.getUserMedia(constraints)
                     .catch(err => {
                         console.error("Error al acceder a la cámara:", err);
                         showNotification('Error al acceder a la cámara: ' + err.message, false);
@@ -1023,5 +1023,3 @@ ESCANER QR SOCIAL
     </script>
 </body>
 </html>
-
-
